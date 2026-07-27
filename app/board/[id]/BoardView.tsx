@@ -71,9 +71,14 @@ export default function BoardView({ boardId, lists, cards }: Props) {
             }`}
           >
             <div className="mb-2 flex items-center justify-between px-1">
-              <h3 className="text-sm font-semibold text-slate-700">
-                {list.title}
-              </h3>
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-slate-700">
+                  {list.title}
+                </h3>
+                <span className="rounded-full bg-slate-200 px-2 text-xs font-medium text-slate-600">
+                  {cardsFor(list.id).length}
+                </span>
+              </div>
               <form action={deleteList}>
                 <input type="hidden" name="id" value={list.id} />
                 <input type="hidden" name="board_id" value={boardId} />

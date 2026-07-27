@@ -95,7 +95,7 @@ export default async function DashboardPage() {
             ))
           ) : (
             <p className="col-span-full rounded-xl border border-dashed border-slate-300 py-12 text-center text-sm text-slate-400">
-              Todavía no tenés tableros. Creá el primero arriba.
+              Todavía no tienes tableros. Crea el primero arriba.
             </p>
           )}
         </div>

@@ -28,8 +28,8 @@ export default function AuthForm({ mode, action, error }: Props) {
           </h1>
           <p className="mt-1 text-sm text-slate-500">
             {isLogin
-              ? "Ingresá para ver tus tableros."
-              : "Empezá a organizar en segundos."}
+              ? "Ingresa para ver tus tableros."
+              : "Empieza a organizar en segundos."}
           </p>
 
           {error ? (
@@ -78,22 +78,22 @@ export default function AuthForm({ mode, action, error }: Props) {
         <p className="mt-6 text-center text-sm text-slate-600">
           {isLogin ? (
             <>
-              ¿No tenés cuenta?{" "}
+              ¿No tienes cuenta?{" "}
               <Link
                 href="/signup"
                 className="font-medium text-brand-600 hover:underline"
               >
-                Registrate
+                Regístrate
               </Link>
             </>
           ) : (
             <>
-              ¿Ya tenés cuenta?{" "}
+              ¿Ya tienes cuenta?{" "}
               <Link
                 href="/login"
                 className="font-medium text-brand-600 hover:underline"
               >
-                Entrá
+                Entra
               </Link>
             </>
           )}

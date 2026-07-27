@@ -10,22 +10,22 @@ Mini app tipo Trello: **tableros → listas → tarjetas**, con drag & drop, aut
 ## Puesta en marcha (local)
 
 ### 1. Crear proyecto Supabase
-1. [supabase.com](https://supabase.com) → New project (guardá la DB password).
+1. [supabase.com](https://supabase.com) → New project (guarda la DB password).
 2. Espera a que el proyecto termine de provisionar (~2 min).
 
 ### 2. Cargar el schema
-Dashboard Supabase → **SQL Editor** → New query → pegá todo `supabase/schema.sql` → **Run**.
+Dashboard Supabase → **SQL Editor** → New query → pega todo `supabase/schema.sql` → **Run**.
 Crea tablas `boards`, `lists`, `cards` + políticas RLS (cada usuario solo ve lo suyo).
 
 ### 3. Auth: desactivar confirmación por email (para demo rápida)
-Dashboard → **Authentication → Providers → Email** → apagá "Confirm email".
+Dashboard → **Authentication → Providers → Email** → apaga "Confirm email".
 Así el signup loguea al instante sin correo de verificación.
 
 ### 4. Variables de entorno
 ```bash
 cp .env.local.example .env.local
 ```
-Rellená con Dashboard → **Project Settings → API**:
+Rellena con Dashboard → **Project Settings → API**:
 - `NEXT_PUBLIC_SUPABASE_URL` → Project URL
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → anon public key
 
@@ -34,7 +34,7 @@ Rellená con Dashboard → **Project Settings → API**:
 npm install
 npm run dev
 ```
-Abrí http://localhost:3000
+Abre http://localhost:3000
 
 ## Estructura
 ```
