@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import type { Card, List } from "@/lib/types";
 import {
   createCard,
@@ -22,6 +22,13 @@ export default function BoardView({ boardId, lists, cards }: Props) {
   const [dragId, setDragId] = useState<string | null>(null);
   const [overList, setOverList] = useState<string | null>(null);
   const [isPending, start] = useTransition();
+
+  // Server revalidates after each action; keep local copy in sync with the
+  // authoritative props (useState only seeds once, so without this newly
+  // created / moved / deleted cards wouldn't show until a full reload).
+  useEffect(() => {
+    setLocalCards(cards);
+  }, [cards]);
 
   function cardsFor(listId: string) {
     return localCards
@@ -115,6 +122,9 @@ export default function BoardView({ boardId, lists, cards }: Props) {
                 placeholder="+ Añadir tarjeta"
                 className="w-full rounded-lg border border-transparent bg-slate-100 px-2 py-1.5 text-sm outline-none placeholder:text-slate-400 focus:border-slate-300 focus:bg-white"
               />
+              <button type="submit" className="sr-only">
+                Añadir tarjeta
+              </button>
             </form>
           </div>
         ))}
@@ -131,6 +141,9 @@ export default function BoardView({ boardId, lists, cards }: Props) {
             placeholder="+ Añadir lista"
             className="w-full rounded-lg bg-white px-2 py-1.5 text-sm outline-none placeholder:text-slate-400"
           />
+          <button type="submit" className="sr-only">
+            Añadir lista
+          </button>
         </form>
       </div>
 
