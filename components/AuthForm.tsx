@@ -10,7 +10,7 @@ export default function AuthForm({ mode, action, error }: Props) {
   const isLogin = mode === "login";
 
   return (
-    <main className="grid min-h-screen place-items-center bg-slate-50 px-6">
+    <main className="grid min-h-screen place-items-center bg-slate-50 px-6 dark:bg-slate-900">
       <div className="w-full max-w-sm">
         <Link
           href="/"
@@ -19,14 +19,14 @@ export default function AuthForm({ mode, action, error }: Props) {
           <div className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white font-bold">
             K
           </div>
-          <span className="text-lg font-semibold">Kanban</span>
+          <span className="text-lg font-semibold dark:text-white">Kanban</span>
         </Link>
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h1 className="text-2xl font-bold text-slate-900">
+        <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
             {isLogin ? "Entrar" : "Crear cuenta"}
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {isLogin
               ? "Ingresa para ver tus tableros."
               : "Empieza a organizar en segundos."}
@@ -40,7 +40,7 @@ export default function AuthForm({ mode, action, error }: Props) {
 
           <form action={action} className="mt-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Email
               </label>
               <input
@@ -48,12 +48,12 @@ export default function AuthForm({ mode, action, error }: Props) {
                 type="email"
                 required
                 autoComplete="email"
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder:text-slate-400"
                 placeholder="tu@email.com"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-slate-700">
+              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Contraseña
               </label>
               <input
@@ -62,7 +62,7 @@ export default function AuthForm({ mode, action, error }: Props) {
                 required
                 minLength={6}
                 autoComplete={isLogin ? "current-password" : "new-password"}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder:text-slate-400"
                 placeholder="Mínimo 6 caracteres"
               />
             </div>
@@ -75,7 +75,7 @@ export default function AuthForm({ mode, action, error }: Props) {
           </form>
         </div>
 
-        <p className="mt-6 text-center text-sm text-slate-600">
+        <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
           {isLogin ? (
             <>
               ¿No tienes cuenta?{" "}

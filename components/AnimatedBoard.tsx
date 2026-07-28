@@ -16,14 +16,14 @@ export default function AnimatedBoard() {
           {COLUMNS.map((col) => (
             <div
               key={col.title}
-              className="rounded-xl bg-slate-100 p-3"
+              className="rounded-xl bg-slate-100 p-3 dark:bg-slate-700/50"
               style={{ width: 148, height: 236 }}
             >
               <div className="mb-2 flex items-center gap-2 px-1">
-                <p className="text-xs font-semibold text-slate-700">
+                <p className="text-xs font-semibold text-slate-700 dark:text-slate-200">
                   {col.title}
                 </p>
-                <span className="rounded-full bg-slate-200 px-1.5 text-[10px] font-medium text-slate-500">
+                <span className="rounded-full bg-slate-200 px-1.5 text-[10px] font-medium text-slate-500 dark:bg-slate-600 dark:text-slate-300">
                   {col.cards.length}
                 </span>
               </div>
@@ -35,7 +35,7 @@ export default function AnimatedBoard() {
                 {col.cards.map((c) => (
                   <div
                     key={c}
-                    className="rounded-lg bg-white px-2.5 py-2 text-xs text-slate-600 shadow-sm"
+                    className="rounded-lg bg-white px-2.5 py-2 text-xs text-slate-600 shadow-sm dark:bg-slate-600 dark:text-slate-200"
                   >
                     {c}
                   </div>
@@ -50,7 +50,7 @@ export default function AnimatedBoard() {
           className="demo-card absolute"
           style={{ left: 12, top: 52, width: 124 }}
         >
-          <div className="relative rounded-lg bg-white px-2.5 py-2 text-xs font-medium text-slate-800 shadow-lg ring-1 ring-brand-200">
+          <div className="relative rounded-lg bg-white px-2.5 py-2 text-xs font-medium text-slate-800 shadow-lg ring-1 ring-brand-200 dark:bg-slate-600 dark:text-slate-100 dark:ring-brand-500/50">
             {/* texto B en flujo define la altura; texto A superpuesto */}
             <span className="demo-text-b block">Diseñar landing</span>
             <span className="demo-text-a absolute inset-0 flex items-center px-2.5 text-slate-400">

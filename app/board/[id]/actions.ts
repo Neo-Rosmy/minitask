@@ -66,6 +66,27 @@ export async function deleteCard(formData: FormData) {
   revalidatePath(`/board/${boardId}`);
 }
 
+export async function updateCard(formData: FormData) {
+  const supabase = await client();
+  const id = String(formData.get("id") ?? "");
+  const boardId = String(formData.get("board_id") ?? "");
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const dueDate = String(formData.get("due_date") ?? "").trim();
+  if (!id || !title) return;
+
+  await supabase
+    .from("cards")
+    .update({
+      title,
+      description: description || null,
+      due_date: dueDate || null,
+    })
+    .eq("id", id);
+
+  revalidatePath(`/board/${boardId}`);
+}
+
 // ---- Move card (drag & drop) ----
 export async function moveCard(
   cardId: string,

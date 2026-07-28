@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { Board, Card, List } from "@/lib/types";
 import BoardView from "./BoardView";
+import ThemeToggle from "@/components/ThemeToggle";
 
 export default async function BoardPage({
   params,
@@ -37,19 +38,20 @@ export default async function BoardPage({
 
   return (
     <div className="min-h-screen">
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto flex max-w-full items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="rounded-lg px-2 py-1 text-sm text-slate-500 hover:bg-slate-100"
+              className="rounded-lg px-2 py-1 text-sm text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
             >
               ← Tableros
             </Link>
-            <h1 className="text-lg font-semibold text-slate-900">
+            <h1 className="text-lg font-semibold text-slate-900 dark:text-white">
               {(board as Board).title}
             </h1>
           </div>
+          <ThemeToggle />
         </div>
       </header>
 
