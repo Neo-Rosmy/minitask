@@ -26,6 +26,7 @@ create table if not exists public.cards (
   description text,
   due_date    date,
   labels      text[] not null default '{}',
+  checklist   jsonb not null default '[]'::jsonb,
   position    int  not null default 0,
   created_at  timestamptz not null default now()
 );

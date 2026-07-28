@@ -13,6 +13,12 @@ export type List = {
   created_at: string;
 };
 
+export type ChecklistItem = {
+  id: string;
+  text: string;
+  done: boolean;
+};
+
 export type Card = {
   id: string;
   list_id: string;
@@ -20,6 +26,7 @@ export type Card = {
   description: string | null;
   due_date: string | null;
   labels: string[];
+  checklist: ChecklistItem[];
   position: number;
   created_at: string;
 };

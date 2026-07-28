@@ -2,14 +2,14 @@
 
 import { useEffect, useState, useTransition } from "react";
 import type { Card, List } from "@/lib/types";
-import { LABELS, LABEL_MAP } from "@/lib/labels";
+import { LABEL_MAP } from "@/lib/labels";
+import CardModal from "@/components/CardModal";
 import {
   createCard,
   createList,
   deleteCard,
   deleteList,
   reorderList,
-  updateCard,
 } from "./actions";
 
 type Props = {
@@ -117,16 +117,6 @@ export default function BoardView({ boardId, lists, cards }: Props) {
     });
     start(() => {
       reorderList(boardId, listId, order);
-    });
-  }
-
-  function handleDelete(cardId: string) {
-    const fd = new FormData();
-    fd.set("id", cardId);
-    fd.set("board_id", boardId);
-    setEditing(null);
-    start(() => {
-      deleteCard(fd);
     });
   }
 
@@ -239,25 +229,44 @@ export default function BoardView({ boardId, lists, cards }: Props) {
                         </button>
                       </form>
                     </div>
-                    {(due || card.description) && (
-                      <div className="mt-1.5 flex items-center gap-2">
-                        {due && (
-                          <span
-                            className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${due.tone}`}
-                          >
-                            📅 {due.label}
-                          </span>
-                        )}
-                        {card.description && (
-                          <span
-                            className="text-slate-400 dark:text-slate-500"
-                            title="Tiene descripción"
-                          >
-                            ☰
-                          </span>
-                        )}
-                      </div>
-                    )}
+                    {(() => {
+                      const cl = card.checklist ?? [];
+                      const clDone = cl.filter((i) => i.done).length;
+                      const allDone = cl.length > 0 && clDone === cl.length;
+                      if (!due && !card.description && cl.length === 0)
+                        return null;
+                      return (
+                        <div className="mt-1.5 flex items-center gap-2">
+                          {due && (
+                            <span
+                              className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${due.tone}`}
+                            >
+                              📅 {due.label}
+                            </span>
+                          )}
+                          {cl.length > 0 && (
+                            <span
+                              className={`rounded px-1.5 py-0.5 text-[11px] font-medium ${
+                                allDone
+                                  ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300"
+                                  : "bg-slate-200 text-slate-600 dark:bg-slate-600 dark:text-slate-200"
+                              }`}
+                              title="Checklist"
+                            >
+                              ☑ {clDone}/{cl.length}
+                            </span>
+                          )}
+                          {card.description && (
+                            <span
+                              className="text-slate-400 dark:text-slate-500"
+                              title="Tiene descripción"
+                            >
+                              ☰
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
                 );
               })}
@@ -304,112 +313,11 @@ export default function BoardView({ boardId, lists, cards }: Props) {
 
       {/* Card detail modal */}
       {editing && (
-        <div
-          className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 p-4 pt-24"
-          onClick={() => setEditing(null)}
-        >
-          <div
-            className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl dark:bg-slate-800"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <form
-              action={async (fd) => {
-                await updateCard(fd);
-                setEditing(null);
-              }}
-              className="space-y-4"
-            >
-              <input type="hidden" name="id" value={editing.id} />
-              <input type="hidden" name="board_id" value={boardId} />
-
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">
-                  Título
-                </label>
-                <input
-                  name="title"
-                  required
-                  defaultValue={editing.title}
-                  className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">
-                  Descripción
-                </label>
-                <textarea
-                  name="description"
-                  rows={4}
-                  defaultValue={editing.description ?? ""}
-                  placeholder="Detalles, notas, checklist…"
-                  className="mt-1 w-full resize-y rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder:text-slate-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">
-                  Etiquetas
-                </label>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {LABELS.map((l) => (
-                    <label key={l.key} className="cursor-pointer">
-                      <input
-                        type="checkbox"
-                        name="labels"
-                        value={l.key}
-                        defaultChecked={editing.labels?.includes(l.key)}
-                        className="peer sr-only"
-                      />
-                      <span
-                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium opacity-40 ring-2 ring-transparent transition peer-checked:opacity-100 peer-checked:ring-brand-500 ${l.chip}`}
-                      >
-                        {l.name}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">
-                  Fecha de vencimiento
-                </label>
-                <input
-                  name="due_date"
-                  type="date"
-                  defaultValue={editing.due_date ?? ""}
-                  className="mt-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
-                />
-              </div>
-
-              <div className="flex items-center justify-between pt-2">
-                <button
-                  type="button"
-                  onClick={() => handleDelete(editing.id)}
-                  className="rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
-                >
-                  Eliminar
-                </button>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setEditing(null)}
-                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-700"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700"
-                  >
-                    Guardar
-                  </button>
-                </div>
-              </div>
-            </form>
-          </div>
-        </div>
+        <CardModal
+          card={editing}
+          boardId={boardId}
+          onClose={() => setEditing(null)}
+        />
       )}
     </main>
   );

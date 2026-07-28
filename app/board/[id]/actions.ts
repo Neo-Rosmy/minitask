@@ -76,6 +76,26 @@ export async function updateCard(formData: FormData) {
   const labels = formData.getAll("labels").map(String);
   if (!id || !title) return;
 
+  // checklist arrives as a JSON string; validate shape before persisting.
+  let checklist: { id: string; text: string; done: boolean }[] = [];
+  const rawChecklist = formData.get("checklist");
+  if (typeof rawChecklist === "string" && rawChecklist) {
+    try {
+      const parsed = JSON.parse(rawChecklist);
+      if (Array.isArray(parsed)) {
+        checklist = parsed
+          .filter((x) => x && typeof x.text === "string")
+          .map((x) => ({
+            id: String(x.id ?? ""),
+            text: String(x.text).slice(0, 300),
+            done: !!x.done,
+          }));
+      }
+    } catch {
+      // malformed payload — keep checklist empty rather than failing the save.
+    }
+  }
+
   await supabase
     .from("cards")
     .update({
@@ -83,6 +103,7 @@ export async function updateCard(formData: FormData) {
       description: description || null,
       due_date: dueDate || null,
       labels,
+      checklist,
     })
     .eq("id", id);
 
