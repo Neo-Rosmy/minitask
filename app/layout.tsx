@@ -2,9 +2,25 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Kanban — Organiza tus tareas",
+  metadataBase: new URL("https://minitask-fawn.vercel.app"),
+  title: {
+    default: "Kanban — Organiza tus tareas",
+    template: "%s · Kanban",
+  },
   description:
     "Tableros, listas y tarjetas para organizar tu trabajo. Simple, rápido, tuyo.",
+  openGraph: {
+    title: "Kanban — Organiza tu trabajo en tableros",
+    description:
+      "Tableros, listas y tarjetas con drag & drop. Hecho con Next.js + Supabase.",
+    type: "website",
+    locale: "es_ES",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kanban — Organiza tu trabajo en tableros",
+    description: "Tableros, listas y tarjetas con drag & drop.",
+  },
 };
 
 export default function RootLayout({

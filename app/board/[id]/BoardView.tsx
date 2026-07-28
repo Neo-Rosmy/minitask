@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import type { Card, List } from "@/lib/types";
-import { LABEL_MAP } from "@/lib/labels";
+import { LABELS, LABEL_MAP } from "@/lib/labels";
 import CardModal from "@/components/CardModal";
 import {
   createCard,
@@ -44,7 +44,23 @@ export default function BoardView({ boardId, lists, cards }: Props) {
   // Card id the dragged card would be inserted BEFORE; null = append at end.
   const [overBefore, setOverBefore] = useState<string | null>(null);
   const [editing, setEditing] = useState<Card | null>(null);
+  const [query, setQuery] = useState("");
+  const [filterLabels, setFilterLabels] = useState<string[]>([]);
   const [isPending, start] = useTransition();
+
+  const filterActive = query.trim() !== "" || filterLabels.length > 0;
+
+  function matchesFilter(card: Card) {
+    const q = query.trim().toLowerCase();
+    const textOk =
+      !q ||
+      card.title.toLowerCase().includes(q) ||
+      (card.description ?? "").toLowerCase().includes(q);
+    const labelOk =
+      filterLabels.length === 0 ||
+      filterLabels.some((l) => card.labels?.includes(l));
+    return textOk && labelOk;
+  }
 
   // Server revalidates after each action; keep local copy in sync with the
   // authoritative props (useState only seeds once, so without this newly
@@ -121,9 +137,53 @@ export default function BoardView({ boardId, lists, cards }: Props) {
   }
 
   return (
-    <main className="h-[calc(100vh-65px)] overflow-x-auto bg-slate-50 p-6 dark:bg-slate-900">
-      <div className="flex items-start gap-4">
-        {lists.map((list) => (
+    <main className="flex h-[calc(100vh-65px)] flex-col bg-slate-50 dark:bg-slate-900">
+      {/* Filter / search bar */}
+      <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 px-6 py-3 dark:border-slate-800">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Buscar tarjetas…"
+          className="w-56 rounded-lg border border-slate-300 px-3 py-1.5 text-sm outline-none focus:border-brand-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
+        />
+        <div className="flex flex-wrap gap-1.5">
+          {LABELS.map((l) => {
+            const active = filterLabels.includes(l.key);
+            return (
+              <button
+                key={l.key}
+                type="button"
+                onClick={() =>
+                  setFilterLabels((prev) =>
+                    active ? prev.filter((k) => k !== l.key) : [...prev, l.key]
+                  )
+                }
+                className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${l.chip} ${
+                  active ? "ring-2 ring-brand-500" : "opacity-50"
+                }`}
+              >
+                {l.name}
+              </button>
+            );
+          })}
+        </div>
+        {filterActive && (
+          <button
+            type="button"
+            onClick={() => {
+              setQuery("");
+              setFilterLabels([]);
+            }}
+            className="text-xs text-slate-500 hover:underline dark:text-slate-400"
+          >
+            Limpiar
+          </button>
+        )}
+      </div>
+
+      <div className="flex-1 overflow-x-auto p-6">
+        <div className="flex items-start gap-4">
+          {lists.map((list) => (
           <div
             key={list.id}
             onDragOver={(e) => {
@@ -143,13 +203,23 @@ export default function BoardView({ boardId, lists, cards }: Props) {
                   {list.title}
                 </h3>
                 <span className="rounded-full bg-slate-200 px-2 text-xs font-medium text-slate-600 dark:bg-slate-700 dark:text-slate-300">
-                  {cardsFor(list.id).length}
+                  {filterActive
+                    ? `${cardsFor(list.id).filter(matchesFilter).length}/${cardsFor(list.id).length}`
+                    : cardsFor(list.id).length}
                 </span>
               </div>
               <form action={deleteList}>
                 <input type="hidden" name="id" value={list.id} />
                 <input type="hidden" name="board_id" value={boardId} />
                 <button
+                  onClick={(e) => {
+                    if (
+                      !window.confirm(
+                        `¿Eliminar la lista "${list.title}" y todas sus tarjetas?`
+                      )
+                    )
+                      e.preventDefault();
+                  }}
                   className="rounded px-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/40"
                   title="Eliminar lista"
                 >
@@ -159,7 +229,9 @@ export default function BoardView({ boardId, lists, cards }: Props) {
             </div>
 
             <div className="space-y-2">
-              {cardsFor(list.id).map((card) => {
+              {cardsFor(list.id)
+                .filter(matchesFilter)
+                .map((card) => {
                 const due = dueMeta(card.due_date);
                 return (
                   <div
@@ -222,6 +294,12 @@ export default function BoardView({ boardId, lists, cards }: Props) {
                           value={boardId}
                         />
                         <button
+                          onClick={(e) => {
+                            if (
+                              !window.confirm(`¿Eliminar la tarjeta "${card.title}"?`)
+                            )
+                              e.preventDefault();
+                          }}
                           className="rounded px-1 text-slate-300 opacity-0 transition hover:text-red-600 group-hover:opacity-100 dark:text-slate-500"
                           title="Eliminar tarjeta"
                         >
@@ -305,11 +383,12 @@ export default function BoardView({ boardId, lists, cards }: Props) {
             Añadir lista
           </button>
         </form>
-      </div>
+        </div>
 
-      {isPending ? (
-        <p className="mt-4 text-xs text-slate-400">Guardando…</p>
-      ) : null}
+        {isPending ? (
+          <p className="mt-4 text-xs text-slate-400">Guardando…</p>
+        ) : null}
+      </div>
 
       {/* Card detail modal */}
       {editing && (

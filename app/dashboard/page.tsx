@@ -4,6 +4,7 @@ import { signout } from "../login/actions";
 import { createBoard, deleteBoard } from "./actions";
 import type { Board } from "@/lib/types";
 import ThemeToggle from "@/components/ThemeToggle";
+import ConfirmButton from "@/components/ConfirmButton";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -88,12 +89,13 @@ export default async function DashboardPage() {
                 </Link>
                 <form action={deleteBoard} className="absolute right-3 top-3">
                   <input type="hidden" name="id" value={b.id} />
-                  <button
-                    className="rounded-md px-2 py-1 text-xs text-slate-400 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
+                  <ConfirmButton
+                    message={`¿Eliminar el tablero "${b.title}" y todas sus listas y tarjetas? Esta acción no se puede deshacer.`}
                     title="Eliminar tablero"
+                    className="rounded-md px-2 py-1 text-xs text-slate-400 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
                   >
                     ✕
-                  </button>
+                  </ConfirmButton>
                 </form>
               </div>
             ))

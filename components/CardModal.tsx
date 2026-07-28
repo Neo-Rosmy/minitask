@@ -207,6 +207,8 @@ export default function CardModal({
             <button
               type="button"
               onClick={async () => {
+                if (!window.confirm(`¿Eliminar la tarjeta "${card.title}"?`))
+                  return;
                 const fd = new FormData();
                 fd.set("id", card.id);
                 fd.set("board_id", boardId);
