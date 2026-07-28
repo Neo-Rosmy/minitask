@@ -30,9 +30,13 @@ export default async function DashboardPage() {
             </span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
-            <span className="hidden text-slate-500 dark:text-slate-400 sm:inline">
-              {user?.email}
-            </span>
+            <Link
+              href="/account"
+              className="hidden font-medium text-slate-500 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 sm:inline"
+            >
+              {(user?.user_metadata?.display_name as string | undefined) ||
+                user?.email}
+            </Link>
             <ThemeToggle />
             <form action={signout}>
               <button className="rounded-lg border border-slate-300 px-3 py-1.5 font-medium text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-800">
