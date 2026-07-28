@@ -39,7 +39,9 @@ export async function updateEmail(formData: FormData) {
   const origin = await requestOrigin();
   const { error } = await supabase.auth.updateUser(
     { email },
-    origin ? { emailRedirectTo: `${origin}/account` } : undefined
+    origin
+      ? { emailRedirectTo: `${origin}/auth/confirm?next=/account` }
+      : undefined
   );
   if (error) back("error", error.message);
 
