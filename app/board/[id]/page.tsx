@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { Board, Card, List } from "@/lib/types";
+import type { Board, BoardLabel, Card, List } from "@/lib/types";
 import BoardView from "./BoardView";
 import ThemeToggle from "@/components/ThemeToggle";
 
@@ -36,8 +36,14 @@ export default async function BoardPage({
         .order("position", { ascending: true })
     : { data: [] as Card[] };
 
+  const { data: boardLabels } = await supabase
+    .from("board_labels")
+    .select("*")
+    .eq("board_id", id)
+    .order("created_at", { ascending: true });
+
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-x-hidden">
       <header className="border-b border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
         <div className="mx-auto flex max-w-full items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
@@ -59,6 +65,7 @@ export default async function BoardPage({
         boardId={id}
         lists={(lists ?? []) as List[]}
         cards={(cards ?? []) as Card[]}
+        boardLabels={(boardLabels ?? []) as BoardLabel[]}
       />
     </div>
   );

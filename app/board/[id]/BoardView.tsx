@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
-import type { Card, List } from "@/lib/types";
-import { LABELS, LABEL_MAP } from "@/lib/labels";
+import { useEffect, useMemo, useState, useTransition } from "react";
+import type { BoardLabel, Card, List } from "@/lib/types";
+import { COLOR_MAP } from "@/lib/labels";
 import CardModal from "@/components/CardModal";
+import LabelsManager from "@/components/LabelsManager";
 import {
   createCard,
   createList,
@@ -16,19 +17,36 @@ type Props = {
   boardId: string;
   lists: List[];
   cards: Card[];
+  boardLabels: BoardLabel[];
 };
 
-// Urgencia de la fecha de vencimiento → color + etiqueta corta.
+// Urgencia de la fecha/hora de vencimiento → color + etiqueta corta.
+// due es un timestamp local ("YYYY-MM-DDTHH:mm" o con segundos).
 function dueMeta(due: string | null) {
   if (!due) return null;
+  const d = new Date(due.replace(" ", "T"));
+  if (isNaN(d.getTime())) return null;
+  const startOfDue = new Date(d);
+  startOfDue.setHours(0, 0, 0, 0);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const d = new Date(due + "T00:00:00");
-  const diffDays = Math.round((d.getTime() - today.getTime()) / 86400000);
-  const label = d.toLocaleDateString("es", { day: "2-digit", month: "short" });
+  const diffDays = Math.round(
+    (startOfDue.getTime() - today.getTime()) / 86400000
+  );
+  const hasTime = d.getHours() !== 0 || d.getMinutes() !== 0;
+  const dateStr = d.toLocaleDateString("es", {
+    day: "2-digit",
+    month: "short",
+  });
+  const label = hasTime
+    ? `${dateStr} ${d.toLocaleTimeString("es", {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}`
+    : dateStr;
   let tone =
     "bg-slate-200 text-slate-600 dark:bg-slate-600 dark:text-slate-200";
-  if (diffDays < 0)
+  if (d.getTime() < Date.now())
     tone = "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300";
   else if (diffDays <= 2)
     tone =
@@ -36,7 +54,12 @@ function dueMeta(due: string | null) {
   return { label, tone };
 }
 
-export default function BoardView({ boardId, lists, cards }: Props) {
+export default function BoardView({
+  boardId,
+  lists,
+  cards,
+  boardLabels,
+}: Props) {
   // Local optimistic copy so drag feels instant; server action revalidates.
   const [localCards, setLocalCards] = useState<Card[]>(cards);
   const [dragId, setDragId] = useState<string | null>(null);
@@ -46,7 +69,13 @@ export default function BoardView({ boardId, lists, cards }: Props) {
   const [editing, setEditing] = useState<Card | null>(null);
   const [query, setQuery] = useState("");
   const [filterLabels, setFilterLabels] = useState<string[]>([]);
+  const [showLabels, setShowLabels] = useState(false);
   const [isPending, start] = useTransition();
+
+  const labelById = useMemo(
+    () => Object.fromEntries(boardLabels.map((l) => [l.id, l])),
+    [boardLabels]
+  );
 
   const filterActive = query.trim() !== "" || filterLabels.length > 0;
 
@@ -147,18 +176,20 @@ export default function BoardView({ boardId, lists, cards }: Props) {
           className="w-56 rounded-lg border border-slate-300 px-3 py-1.5 text-sm outline-none focus:border-brand-500 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-100 dark:placeholder:text-slate-400"
         />
         <div className="flex flex-wrap gap-1.5">
-          {LABELS.map((l) => {
-            const active = filterLabels.includes(l.key);
+          {boardLabels.map((l) => {
+            const active = filterLabels.includes(l.id);
+            const color =
+              COLOR_MAP[l.color]?.chip ?? COLOR_MAP.blue.chip;
             return (
               <button
-                key={l.key}
+                key={l.id}
                 type="button"
                 onClick={() =>
                   setFilterLabels((prev) =>
-                    active ? prev.filter((k) => k !== l.key) : [...prev, l.key]
+                    active ? prev.filter((k) => k !== l.id) : [...prev, l.id]
                   )
                 }
-                className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${l.chip} ${
+                className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${color} ${
                   active ? "ring-2 ring-brand-500" : "opacity-50"
                 }`}
               >
@@ -167,6 +198,13 @@ export default function BoardView({ boardId, lists, cards }: Props) {
             );
           })}
         </div>
+        <button
+          type="button"
+          onClick={() => setShowLabels(true)}
+          className="rounded-lg border border-slate-300 px-2.5 py-1 text-xs font-medium text-slate-600 hover:bg-slate-100 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800"
+        >
+          ⚙ Etiquetas
+        </button>
         {filterActive && (
           <button
             type="button"
@@ -181,7 +219,7 @@ export default function BoardView({ boardId, lists, cards }: Props) {
         )}
       </div>
 
-      <div className="flex-1 overflow-x-auto p-6">
+      <div className="min-w-0 flex-1 overflow-x-auto p-6">
         <div className="flex items-start gap-4">
           {lists.map((list) => (
           <div
@@ -270,15 +308,19 @@ export default function BoardView({ boardId, lists, cards }: Props) {
                   >
                     {card.labels?.length ? (
                       <div className="mb-1.5 flex flex-wrap gap-1">
-                        {card.labels.map((k) =>
-                          LABEL_MAP[k] ? (
+                        {card.labels.map((id) => {
+                          const lbl = labelById[id];
+                          if (!lbl) return null;
+                          const color =
+                            COLOR_MAP[lbl.color]?.bar ?? COLOR_MAP.blue.bar;
+                          return (
                             <span
-                              key={k}
-                              title={LABEL_MAP[k].name}
-                              className={`h-1.5 w-6 rounded-full ${LABEL_MAP[k].bar}`}
+                              key={id}
+                              title={lbl.name}
+                              className={`h-1.5 w-6 rounded-full ${color}`}
                             />
-                          ) : null
-                        )}
+                          );
+                        })}
                       </div>
                     ) : null}
                     <div className="flex items-start justify-between">
@@ -395,7 +437,17 @@ export default function BoardView({ boardId, lists, cards }: Props) {
         <CardModal
           card={editing}
           boardId={boardId}
+          boardLabels={boardLabels}
           onClose={() => setEditing(null)}
+        />
+      )}
+
+      {/* Labels manager */}
+      {showLabels && (
+        <LabelsManager
+          boardId={boardId}
+          labels={boardLabels}
+          onClose={() => setShowLabels(false)}
         />
       )}
     </main>

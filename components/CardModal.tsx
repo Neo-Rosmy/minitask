@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { Card, ChecklistItem } from "@/lib/types";
-import { LABELS } from "@/lib/labels";
+import type { BoardLabel, Card, ChecklistItem } from "@/lib/types";
+import { COLOR_MAP } from "@/lib/labels";
 import { deleteCard, updateCard } from "@/app/board/[id]/actions";
 
 function newId() {
@@ -13,13 +13,21 @@ function newId() {
   }
 }
 
+// Postgres timestamp ("YYYY-MM-DD HH:mm:ss") → datetime-local ("YYYY-MM-DDTHH:mm").
+function toLocalInput(value: string | null) {
+  if (!value) return "";
+  return value.replace(" ", "T").slice(0, 16);
+}
+
 export default function CardModal({
   card,
   boardId,
+  boardLabels,
   onClose,
 }: {
   card: Card;
   boardId: string;
+  boardLabels: BoardLabel[];
   onClose: () => void;
 }) {
   const [items, setItems] = useState<ChecklistItem[]>(card.checklist ?? []);
@@ -88,24 +96,33 @@ export default function CardModal({
             <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">
               Etiquetas
             </label>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {LABELS.map((l) => (
-                <label key={l.key} className="cursor-pointer">
-                  <input
-                    type="checkbox"
-                    name="labels"
-                    value={l.key}
-                    defaultChecked={card.labels?.includes(l.key)}
-                    className="peer sr-only"
-                  />
-                  <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium opacity-40 ring-2 ring-transparent transition peer-checked:opacity-100 peer-checked:ring-brand-500 ${l.chip}`}
-                  >
-                    {l.name}
-                  </span>
-                </label>
-              ))}
-            </div>
+            {boardLabels.length === 0 ? (
+              <p className="mt-2 text-xs text-slate-400">
+                No hay etiquetas. Creá algunas con ⚙ Etiquetas en el tablero.
+              </p>
+            ) : (
+              <div className="mt-2 flex flex-wrap gap-2">
+                {boardLabels.map((l) => {
+                  const chip = COLOR_MAP[l.color]?.chip ?? COLOR_MAP.blue.chip;
+                  return (
+                    <label key={l.id} className="cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="labels"
+                        value={l.id}
+                        defaultChecked={card.labels?.includes(l.id)}
+                        className="peer sr-only"
+                      />
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium opacity-40 ring-2 ring-transparent transition peer-checked:opacity-100 peer-checked:ring-brand-500 ${chip}`}
+                      >
+                        {l.name}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Checklist */}
@@ -193,12 +210,12 @@ export default function CardModal({
 
           <div>
             <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">
-              Fecha de vencimiento
+              Fecha y hora de vencimiento
             </label>
             <input
               name="due_date"
-              type="date"
-              defaultValue={card.due_date ?? ""}
+              type="datetime-local"
+              defaultValue={toLocalInput(card.due_date)}
               className="mt-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100"
             />
           </div>

@@ -19,6 +19,14 @@ export type ChecklistItem = {
   done: boolean;
 };
 
+export type BoardLabel = {
+  id: string;
+  board_id: string;
+  name: string;
+  color: string;
+  created_at: string;
+};
+
 export type Card = {
   id: string;
   list_id: string;

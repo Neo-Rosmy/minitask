@@ -83,28 +83,67 @@ export default async function LandingPage() {
 
       {/* Features */}
       <section className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-800/50">
-        <div className="mx-auto grid max-w-6xl gap-8 px-6 py-16 sm:grid-cols-3">
-          {[
-            {
-              t: "Tableros ilimitados",
-              d: "Un tablero por proyecto. Crea los que necesites.",
-            },
-            {
-              t: "Drag & drop",
-              d: "Mueve tarjetas entre listas con arrastrar y soltar.",
-            },
-            {
-              t: "Seguro por usuario",
-              d: "RLS de Supabase: solo tú ves tus datos.",
-            },
-          ].map((f) => (
-            <div key={f.t}>
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
-                {f.t}
-              </h3>
-              <p className="mt-2 text-slate-600 dark:text-slate-300">{f.d}</p>
-            </div>
-          ))}
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <h2 className="text-center text-3xl font-bold text-slate-900 dark:text-white">
+            Todo lo que necesitas
+          </h2>
+          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                i: "🗂️",
+                t: "Tableros, listas y tarjetas",
+                d: "Organiza cada proyecto en su tablero. Crea los que necesites.",
+              },
+              {
+                i: "✋",
+                t: "Drag & drop",
+                d: "Mueve y reordena tarjetas entre listas arrastrando y soltando.",
+              },
+              {
+                i: "🏷️",
+                t: "Etiquetas de color",
+                d: "Crea, edita y elimina etiquetas propias para clasificar tarjetas.",
+              },
+              {
+                i: "📅",
+                t: "Fecha y hora de vencimiento",
+                d: "Asigna vencimientos con hora y mira de un vistazo qué está por vencer.",
+              },
+              {
+                i: "☑️",
+                t: "Checklists",
+                d: "Divide cada tarjeta en sub-tareas con barra de progreso.",
+              },
+              {
+                i: "📝",
+                t: "Descripciones",
+                d: "Suma detalles y notas a cada tarjeta desde su ficha.",
+              },
+              {
+                i: "🔍",
+                t: "Buscar y filtrar",
+                d: "Encuentra tarjetas por texto o filtra por etiqueta al instante.",
+              },
+              {
+                i: "🌙",
+                t: "Modo oscuro",
+                d: "Alterna entre claro y oscuro; recuerda tu preferencia.",
+              },
+              {
+                i: "🔒",
+                t: "Seguro por usuario",
+                d: "RLS de Supabase: cada usuario solo ve y edita sus propios datos.",
+              },
+            ].map((f) => (
+              <div key={f.t}>
+                <div className="text-2xl">{f.i}</div>
+                <h3 className="mt-3 text-lg font-semibold text-slate-900 dark:text-white">
+                  {f.t}
+                </h3>
+                <p className="mt-2 text-slate-600 dark:text-slate-300">{f.d}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

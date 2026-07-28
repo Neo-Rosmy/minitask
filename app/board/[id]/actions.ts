@@ -133,3 +133,42 @@ export async function reorderList(
 
   revalidatePath(`/board/${boardId}`);
 }
+
+// ---- Board labels (editable per board) ----
+export async function createLabel(
+  boardId: string,
+  name: string,
+  color: string
+) {
+  const supabase = await client();
+  const clean = name.trim().slice(0, 40);
+  if (!boardId || !clean) return;
+  await supabase
+    .from("board_labels")
+    .insert({ board_id: boardId, name: clean, color });
+  revalidatePath(`/board/${boardId}`);
+}
+
+export async function updateLabel(
+  id: string,
+  boardId: string,
+  name: string,
+  color: string
+) {
+  const supabase = await client();
+  const clean = name.trim().slice(0, 40);
+  if (!id || !clean) return;
+  await supabase
+    .from("board_labels")
+    .update({ name: clean, color })
+    .eq("id", id);
+  revalidatePath(`/board/${boardId}`);
+}
+
+export async function deleteLabel(id: string, boardId: string) {
+  const supabase = await client();
+  if (!id) return;
+  // Orphaned ids left on cards.labels are simply ignored on render.
+  await supabase.from("board_labels").delete().eq("id", id);
+  revalidatePath(`/board/${boardId}`);
+}
