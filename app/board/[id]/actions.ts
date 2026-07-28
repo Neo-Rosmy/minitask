@@ -89,28 +89,26 @@ export async function updateCard(formData: FormData) {
   revalidatePath(`/board/${boardId}`);
 }
 
-// ---- Move card (drag & drop) ----
-export async function moveCard(
-  cardId: string,
+// ---- Reorder / move cards (drag & drop) ----
+// orderedIds = the full, final order of cards in targetListId (including the
+// dragged card). Sets list_id + position = index for each, so it handles both
+// reordering within a list and moving between lists at a specific spot.
+export async function reorderList(
+  boardId: string,
   targetListId: string,
-  boardId: string
+  orderedIds: string[]
 ) {
   const supabase = await client();
-  if (!cardId || !targetListId) return;
+  if (!targetListId || orderedIds.length === 0) return;
 
-  const { data: last } = await supabase
-    .from("cards")
-    .select("position")
-    .eq("list_id", targetListId)
-    .order("position", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  const position = (last?.position ?? -1) + 1;
-  await supabase
-    .from("cards")
-    .update({ list_id: targetListId, position })
-    .eq("id", cardId);
+  await Promise.all(
+    orderedIds.map((id, index) =>
+      supabase
+        .from("cards")
+        .update({ list_id: targetListId, position: index })
+        .eq("id", id)
+    )
+  );
 
   revalidatePath(`/board/${boardId}`);
 }

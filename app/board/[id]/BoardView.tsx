@@ -8,7 +8,7 @@ import {
   createList,
   deleteCard,
   deleteList,
-  moveCard,
+  reorderList,
   updateCard,
 } from "./actions";
 
@@ -41,6 +41,8 @@ export default function BoardView({ boardId, lists, cards }: Props) {
   const [localCards, setLocalCards] = useState<Card[]>(cards);
   const [dragId, setDragId] = useState<string | null>(null);
   const [overList, setOverList] = useState<string | null>(null);
+  // Card id the dragged card would be inserted BEFORE; null = append at end.
+  const [overBefore, setOverBefore] = useState<string | null>(null);
   const [editing, setEditing] = useState<Card | null>(null);
   const [isPending, start] = useTransition();
 
@@ -61,18 +63,60 @@ export default function BoardView({ boardId, lists, cards }: Props) {
       .sort((a, b) => a.position - b.position);
   }
 
-  function onDrop(targetListId: string) {
-    if (!dragId) return;
-    const card = localCards.find((c) => c.id === dragId);
-    setOverList(null);
-    setDragId(null);
-    if (!card || card.list_id === targetListId) return;
+  // Final order of a target list after inserting `draggedId` before `beforeId`
+  // (null = append). The dragged card is removed first so it can't duplicate.
+  function computeOrder(
+    listId: string,
+    draggedId: string,
+    beforeId: string | null
+  ) {
+    const targetIds = cardsFor(listId)
+      .filter((c) => c.id !== draggedId)
+      .map((c) => c.id);
+    const order: string[] = [];
+    let inserted = false;
+    for (const id of targetIds) {
+      if (id === beforeId) {
+        order.push(draggedId);
+        inserted = true;
+      }
+      order.push(id);
+    }
+    if (!inserted) order.push(draggedId);
+    return order;
+  }
 
-    setLocalCards((prev) =>
-      prev.map((c) => (c.id === dragId ? { ...c, list_id: targetListId } : c))
-    );
+  function handleDrop(listId: string) {
+    const draggedId = dragId;
+    const beforeId = overBefore;
+    setDragId(null);
+    setOverList(null);
+    setOverBefore(null);
+    if (!draggedId) return;
+
+    const order = computeOrder(listId, draggedId, beforeId);
+    const current = cardsFor(listId).map((c) => c.id);
+    const dragged = localCards.find((c) => c.id === draggedId);
+    // No-op: same list and identical order.
+    if (
+      dragged?.list_id === listId &&
+      current.length === order.length &&
+      current.every((id, i) => id === order[i])
+    ) {
+      return;
+    }
+
+    // Optimistic: apply new list_id + positions locally.
+    setLocalCards((prev) => {
+      const map = new Map(prev.map((c) => [c.id, c]));
+      order.forEach((id, i) => {
+        const c = map.get(id);
+        if (c) map.set(id, { ...c, list_id: listId, position: i });
+      });
+      return [...map.values()];
+    });
     start(() => {
-      moveCard(dragId, targetListId, boardId);
+      reorderList(boardId, listId, order);
     });
   }
 
@@ -95,9 +139,10 @@ export default function BoardView({ boardId, lists, cards }: Props) {
             onDragOver={(e) => {
               e.preventDefault();
               setOverList(list.id);
+              setOverBefore(null); // over column gap → append at end
             }}
             onDragLeave={() => setOverList((v) => (v === list.id ? null : v))}
-            onDrop={() => onDrop(list.id)}
+            onDrop={() => handleDrop(list.id)}
             className={`w-72 shrink-0 rounded-xl bg-slate-100 p-3 transition dark:bg-slate-800 ${
               overList === list.id ? "ring-2 ring-brand-400" : ""
             }`}
@@ -131,10 +176,34 @@ export default function BoardView({ boardId, lists, cards }: Props) {
                     key={card.id}
                     draggable
                     onDragStart={() => setDragId(card.id)}
-                    onDragEnd={() => setDragId(null)}
+                    onDragEnd={() => {
+                      setDragId(null);
+                      setOverList(null);
+                      setOverBefore(null);
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (!dragId || card.id === dragId) return;
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const after = e.clientY > rect.top + rect.height / 2;
+                      const listCards = cardsFor(list.id);
+                      const idx = listCards.findIndex((c) => c.id === card.id);
+                      const next = after ? listCards[idx + 1] : listCards[idx];
+                      setOverList(list.id);
+                      setOverBefore(next ? next.id : null);
+                    }}
+                    onDrop={(e) => {
+                      e.stopPropagation();
+                      handleDrop(list.id);
+                    }}
                     onClick={() => setEditing(card)}
                     className={`group cursor-pointer rounded-lg bg-white px-3 py-2 text-sm shadow-sm dark:bg-slate-700 dark:text-slate-100 ${
                       dragId === card.id ? "opacity-50" : ""
+                    } ${
+                      overList === list.id && overBefore === card.id
+                        ? "border-t-2 border-brand-500"
+                        : "border-t-2 border-transparent"
                     }`}
                   >
                     {card.labels?.length ? (
