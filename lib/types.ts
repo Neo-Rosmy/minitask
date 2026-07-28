@@ -19,6 +19,7 @@ export type Card = {
   title: string;
   description: string | null;
   due_date: string | null;
+  labels: string[];
   position: number;
   created_at: string;
 };

@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import type { Card, List } from "@/lib/types";
+import { LABELS, LABEL_MAP } from "@/lib/labels";
 import {
   createCard,
   createList,
@@ -136,6 +137,19 @@ export default function BoardView({ boardId, lists, cards }: Props) {
                       dragId === card.id ? "opacity-50" : ""
                     }`}
                   >
+                    {card.labels?.length ? (
+                      <div className="mb-1.5 flex flex-wrap gap-1">
+                        {card.labels.map((k) =>
+                          LABEL_MAP[k] ? (
+                            <span
+                              key={k}
+                              title={LABEL_MAP[k].name}
+                              className={`h-1.5 w-6 rounded-full ${LABEL_MAP[k].bar}`}
+                            />
+                          ) : null
+                        )}
+                      </div>
+                    ) : null}
                     <div className="flex items-start justify-between">
                       <span className="pr-2">{card.title}</span>
                       <form
@@ -262,6 +276,30 @@ export default function BoardView({ boardId, lists, cards }: Props) {
                   placeholder="Detalles, notas, checklist…"
                   className="mt-1 w-full resize-y rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder:text-slate-400"
                 />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Etiquetas
+                </label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {LABELS.map((l) => (
+                    <label key={l.key} className="cursor-pointer">
+                      <input
+                        type="checkbox"
+                        name="labels"
+                        value={l.key}
+                        defaultChecked={editing.labels?.includes(l.key)}
+                        className="peer sr-only"
+                      />
+                      <span
+                        className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium opacity-40 ring-2 ring-transparent transition peer-checked:opacity-100 peer-checked:ring-brand-500 ${l.chip}`}
+                      >
+                        {l.name}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
 
               <div>

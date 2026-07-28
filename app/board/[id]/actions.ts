@@ -73,6 +73,7 @@ export async function updateCard(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim();
   const description = String(formData.get("description") ?? "").trim();
   const dueDate = String(formData.get("due_date") ?? "").trim();
+  const labels = formData.getAll("labels").map(String);
   if (!id || !title) return;
 
   await supabase
@@ -81,6 +82,7 @@ export async function updateCard(formData: FormData) {
       title,
       description: description || null,
       due_date: dueDate || null,
+      labels,
     })
     .eq("id", id);
 

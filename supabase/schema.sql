@@ -25,6 +25,7 @@ create table if not exists public.cards (
   title       text not null check (char_length(title) between 1 and 500),
   description text,
   due_date    date,
+  labels      text[] not null default '{}',
   position    int  not null default 0,
   created_at  timestamptz not null default now()
 );
