@@ -2,10 +2,20 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
 
 function back(kind: "ok" | "error", msg: string): never {
   redirect(`/account?${kind}=${encodeURIComponent(msg)}`);
+}
+
+// Origin of the current request (localhost in dev, the deployed domain in
+// prod). Used so email confirmation links come back to the right host.
+async function requestOrigin() {
+  const h = await headers();
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "https";
+  return host ? `${proto}://${host}` : "";
 }
 
 export async function updateProfile(formData: FormData) {
@@ -26,7 +36,11 @@ export async function updateEmail(formData: FormData) {
   const email = String(formData.get("email") ?? "").trim();
   if (!email) back("error", "Ingresa un email.");
 
-  const { error } = await supabase.auth.updateUser({ email });
+  const origin = await requestOrigin();
+  const { error } = await supabase.auth.updateUser(
+    { email },
+    origin ? { emailRedirectTo: `${origin}/account` } : undefined
+  );
   if (error) back("error", error.message);
 
   // Supabase envía un enlace de confirmación al nuevo (y al viejo si
