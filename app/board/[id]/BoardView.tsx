@@ -166,9 +166,9 @@ export default function BoardView({
   }
 
   return (
-    <main className="flex h-[calc(100vh-65px)] flex-col bg-slate-50 dark:bg-slate-900">
+    <main className="flex min-h-0 flex-1 flex-col bg-slate-50 dark:bg-slate-900">
       {/* Filter / search bar */}
-      <div className="flex flex-wrap items-center gap-3 border-b border-slate-200 px-6 py-3 dark:border-slate-800">
+      <div className="flex shrink-0 flex-wrap items-center gap-3 border-b border-slate-200 px-6 py-3 dark:border-slate-800">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -221,8 +221,8 @@ export default function BoardView({
         )}
       </div>
 
-      <div className="min-w-0 flex-1 overflow-x-auto p-6">
-        <div className="flex items-start gap-4">
+      <div className="min-w-0 flex-1 overflow-x-auto py-6 [contain:paint]">
+        <div className="flex items-start gap-4 px-6">
           {lists.map((list) => (
           <div
             key={list.id}

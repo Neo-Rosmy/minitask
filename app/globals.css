@@ -6,6 +6,10 @@ html,
 body {
   padding: 0;
   margin: 0;
+  /* The board scrolls its columns horizontally inside their own container.
+     The page itself must never scroll sideways — cap it here so scrolling to
+     the end of a wide board can't drag the layout past the viewport. */
+  overflow-x: hidden;
 }
 
 body {
