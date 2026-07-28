@@ -189,8 +189,10 @@ export default function BoardView({
                     active ? prev.filter((k) => k !== l.id) : [...prev, l.id]
                   )
                 }
-                className={`rounded-full px-2.5 py-1 text-xs font-medium transition ${color} ${
-                  active ? "ring-2 ring-brand-500" : "opacity-50"
+                className={`rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset transition ${color} ${
+                  active
+                    ? "ring-2 ring-brand-500"
+                    : "ring-black/10 hover:ring-black/20 dark:ring-white/10"
                 }`}
               >
                 {l.name}
