@@ -19,11 +19,13 @@ export default function AuthForm({ mode, action, error }: Props) {
           <div className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white font-bold">
             K
           </div>
-          <span className="text-lg font-semibold dark:text-white">Kanban</span>
+          <span className="font-display text-lg font-semibold dark:text-white">
+            Kanban
+          </span>
         </Link>
 
         <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm dark:border-slate-700 dark:bg-slate-800">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+          <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-white">
             {isLogin ? "Entrar" : "Crear cuenta"}
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">

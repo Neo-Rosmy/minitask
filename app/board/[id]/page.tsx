@@ -53,7 +53,7 @@ export default async function BoardPage({
             >
               ← Tableros
             </Link>
-            <h1 className="text-lg font-semibold text-slate-900 dark:text-white">
+            <h1 className="font-display text-lg font-semibold text-slate-900 dark:text-white">
               {(board as Board).title}
             </h1>
           </div>

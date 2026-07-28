@@ -17,7 +17,9 @@ export default async function LandingPage() {
           <div className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white font-bold">
             K
           </div>
-          <span className="text-lg font-semibold dark:text-white">Kanban</span>
+          <span className="font-display text-lg font-semibold dark:text-white">
+            Kanban
+          </span>
         </div>
         <nav className="flex items-center gap-3">
           <ThemeToggle />
@@ -52,7 +54,7 @@ export default async function LandingPage() {
         <span className="inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-medium text-brand-700">
           MVP · Next.js + Supabase
         </span>
-        <h1 className="mx-auto mt-6 max-w-3xl text-5xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-6xl">
+        <h1 className="mx-auto mt-6 max-w-3xl font-display text-5xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-6xl">
           Organiza tu trabajo en{" "}
           <span className="text-brand-600 dark:text-brand-400">tableros</span>
         </h1>
@@ -82,65 +84,77 @@ export default async function LandingPage() {
       </section>
 
       {/* Features */}
-      <section className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-800/50">
-        <div className="mx-auto max-w-6xl px-6 py-16">
-          <h2 className="text-center text-3xl font-bold text-slate-900 dark:text-white">
-            Todo lo que necesitas
-          </h2>
-          <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="border-t border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900">
+        <div className="mx-auto max-w-6xl px-6 py-20">
+          <div className="max-w-2xl">
+            <p className="text-sm font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+              Funcionalidades
+            </p>
+            <h2 className="mt-3 font-display text-3xl font-bold text-slate-900 dark:text-white sm:text-4xl">
+              Todo lo que necesitas para organizarte
+            </h2>
+          </div>
+          <div className="mt-14 grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {[
               {
-                i: "🗂️",
+                n: "01",
                 t: "Tableros, listas y tarjetas",
                 d: "Organiza cada proyecto en su tablero. Crea los que necesites.",
               },
               {
-                i: "✋",
+                n: "02",
                 t: "Drag & drop",
                 d: "Mueve y reordena tarjetas entre listas arrastrando y soltando.",
               },
               {
-                i: "🏷️",
+                n: "03",
                 t: "Etiquetas de color",
                 d: "Crea, edita y elimina etiquetas propias para clasificar tarjetas.",
               },
               {
-                i: "📅",
+                n: "04",
                 t: "Fecha y hora de vencimiento",
                 d: "Asigna vencimientos con hora y mira de un vistazo qué está por vencer.",
               },
               {
-                i: "☑️",
+                n: "05",
                 t: "Checklists",
                 d: "Divide cada tarjeta en sub-tareas con barra de progreso.",
               },
               {
-                i: "📝",
+                n: "06",
                 t: "Descripciones",
                 d: "Suma detalles y notas a cada tarjeta desde su ficha.",
               },
               {
-                i: "🔍",
+                n: "07",
                 t: "Buscar y filtrar",
                 d: "Encuentra tarjetas por texto o filtra por etiqueta al instante.",
               },
               {
-                i: "🌙",
+                n: "08",
                 t: "Modo oscuro",
                 d: "Alterna entre claro y oscuro; recuerda tu preferencia.",
               },
               {
-                i: "🔒",
+                n: "09",
                 t: "Seguro por usuario",
                 d: "RLS de Supabase: cada usuario solo ve y edita sus propios datos.",
               },
             ].map((f) => (
-              <div key={f.t}>
-                <div className="text-2xl">{f.i}</div>
-                <h3 className="mt-3 text-lg font-semibold text-slate-900 dark:text-white">
+              <div
+                key={f.t}
+                className="border-t border-slate-200 pt-5 transition-colors hover:border-brand-500 dark:border-slate-700"
+              >
+                <span className="font-display text-sm font-semibold tabular-nums text-brand-600 dark:text-brand-400">
+                  {f.n}
+                </span>
+                <h3 className="mt-2 font-display text-lg font-semibold text-slate-900 dark:text-white">
                   {f.t}
                 </h3>
-                <p className="mt-2 text-slate-600 dark:text-slate-300">{f.d}</p>
+                <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                  {f.d}
+                </p>
               </div>
             ))}
           </div>

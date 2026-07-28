@@ -25,7 +25,9 @@ export default async function DashboardPage() {
             <div className="grid h-8 w-8 place-items-center rounded-lg bg-brand-600 text-white font-bold">
               K
             </div>
-            <span className="text-lg font-semibold dark:text-white">Kanban</span>
+            <span className="font-display text-lg font-semibold dark:text-white">
+              Kanban
+            </span>
           </Link>
           <div className="flex items-center gap-3 text-sm">
             <span className="hidden text-slate-500 dark:text-slate-400 sm:inline">
@@ -44,7 +46,7 @@ export default async function DashboardPage() {
       <main className="mx-auto max-w-6xl px-6 py-10">
         <div className="flex items-end justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            <h1 className="font-display text-2xl font-bold text-slate-900 dark:text-white">
               Mis tableros
             </h1>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
